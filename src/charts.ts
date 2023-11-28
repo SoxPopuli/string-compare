@@ -48,8 +48,6 @@ export function display_chart(
 }
 
 export function update_chart(chart: Chart, normalized: NamedDistance[], unnormalized: NamedDistance[]) {
-  //console.log("normalized", normalized.map(x => x.distance))
-  //console.log("unnormalized", unnormalized.map(x => x.distance))
   //@ts-ignore
   chart.data.datasets = make_datasets(normalized, unnormalized)
   chart.update()
