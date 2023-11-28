@@ -1,20 +1,24 @@
-trait Method {
-    fn name(&self) -> String;
-    fn is_normalized(&self) -> bool;
-    fn distance(&self, reference: &str, value: &str) -> f32;
-
-    fn normalize(&self, value: f32, max: f32) -> f32 {
-        if self.is_normalized() {
-            value
-        } else {
-            value / max
-        }
-    }
-}
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub enum Distance {
     Normalized(f64),
     Unnormalized(usize),
+}
+
+impl Distance {
+    pub fn normalize(&self, max: usize) -> f64 {
+        match *self {
+            Distance::Normalized(x) => x,
+            Distance::Unnormalized(x) => x as f64 / max as f64,
+        }
+    }
+
+    pub fn as_f64(&self) -> f64 {
+        match *self {
+            Distance::Normalized(x) => x,
+            Distance::Unnormalized(x) => x as f64,
+        }
+    }
 }
 
 impl From<f64> for Distance {
@@ -29,7 +33,7 @@ impl From<usize> for Distance {
     }
 }
 
-pub enum Methods {
+pub enum Method {
     //Edit-based
     DamerauLevenshtein, //both optimal string alignment and restricted.
     Hamming,
@@ -61,37 +65,37 @@ pub enum Methods {
     Length,
 }
 
-impl Methods {
+impl Method {
     pub fn calculate(&self, s1: &str, s2: &str) -> Distance {
         use textdistance::str::*;
 
         match self {
-            Methods::DamerauLevenshtein => damerau_levenshtein(s1, s2).into(),
-            Methods::Hamming => hamming(s1, s2).into(),
-            Methods::Jaro => jaro(s1, s2).into(),
-            Methods::JaroWinkler => jaro_winkler(s1, s2).into(),
-            Methods::Levenshtein => levenshtein(s1, s2).into(),
-            Methods::Sift4Common => sift4_common(s1, s2).into(),
-            Methods::Sift4Simple => sift4_simple(s1, s2).into(),
-            Methods::SmithWaterman => smith_waterman(s1, s2).into(),
-            Methods::Bag => bag(s1, s2).into(),
-            Methods::Cosine => cosine(s1, s2).into(),
-            Methods::EntropyNCD => entropy_ncd(s1, s2).into(),
-            Methods::Jaccard => jaccard(s1, s2).into(),
-            Methods::Overlap => overlap(s1, s2).into(),
-            Methods::Roberts => roberts(s1, s2).into(),
-            Methods::SorensenDice => sorensen_dice(s1, s2).into(),
-            Methods::Tversky => tversky(s1, s2).into(),
-            Methods::LCSSeq => lcsseq(s1, s2).into(),
-            Methods::LCSStr => lcsstr(s1, s2).into(),
-            Methods::RatcliffObershelp => ratcliff_obershelp(s1, s2).into(),
-            Methods::Prefix => prefix(s1, s2).into(),
-            Methods::Suffix => suffix(s1, s2).into(),
-            Methods::Length => length(s1, s2).into(),
+            Method::DamerauLevenshtein => damerau_levenshtein(s1, s2).into(),
+            Method::Hamming => hamming(s1, s2).into(),
+            Method::Jaro => jaro(s1, s2).into(),
+            Method::JaroWinkler => jaro_winkler(s1, s2).into(),
+            Method::Levenshtein => levenshtein(s1, s2).into(),
+            Method::Sift4Common => sift4_common(s1, s2).into(),
+            Method::Sift4Simple => sift4_simple(s1, s2).into(),
+            Method::SmithWaterman => smith_waterman(s1, s2).into(),
+            Method::Bag => bag(s1, s2).into(),
+            Method::Cosine => cosine(s1, s2).into(),
+            Method::EntropyNCD => entropy_ncd(s1, s2).into(),
+            Method::Jaccard => jaccard(s1, s2).into(),
+            Method::Overlap => overlap(s1, s2).into(),
+            Method::Roberts => roberts(s1, s2).into(),
+            Method::SorensenDice => sorensen_dice(s1, s2).into(),
+            Method::Tversky => tversky(s1, s2).into(),
+            Method::LCSSeq => lcsseq(s1, s2).into(),
+            Method::LCSStr => lcsstr(s1, s2).into(),
+            Method::RatcliffObershelp => ratcliff_obershelp(s1, s2).into(),
+            Method::Prefix => prefix(s1, s2).into(),
+            Method::Suffix => suffix(s1, s2).into(),
+            Method::Length => length(s1, s2).into(),
         }
     }
 
-    pub fn all() -> [Methods; 22] {
+    pub fn all() -> [Method; 22] {
         [
             Self::DamerauLevenshtein,
             Self::Hamming,
@@ -118,13 +122,13 @@ impl Methods {
         ]
     }
 
-    pub fn unnormalized() -> impl Iterator<Item = Methods> {
+    pub fn unnormalized() -> impl Iterator<Item = Method> {
         Self::all()
             .into_iter()
             .filter(|x| !x.is_normalized())
     }
 
-    pub fn normalized() -> impl Iterator<Item = Methods> {
+    pub fn normalized() -> impl Iterator<Item = Method> {
         Self::all()
             .into_iter()
             .filter(|x| x.is_normalized())
@@ -140,41 +144,112 @@ impl Methods {
         }
 
         match self {
-            Methods::DamerauLevenshtein => norm(damerau_levenshtein),
-            Methods::Hamming => norm(hamming),
-            Methods::Jaro => norm(jaro),
-            Methods::JaroWinkler => norm(jaro_winkler),
-            Methods::Levenshtein => norm(levenshtein),
-            Methods::Sift4Common => norm(sift4_common),
-            Methods::Sift4Simple => norm(sift4_simple),
-            Methods::SmithWaterman => norm(smith_waterman),
-            Methods::Bag => norm(bag),
-            Methods::Cosine => norm(cosine),
-            Methods::EntropyNCD => norm(entropy_ncd),
-            Methods::Jaccard => norm(jaccard),
-            Methods::Overlap => norm(overlap),
-            Methods::Roberts => norm(roberts),
-            Methods::SorensenDice => norm(sorensen_dice),
-            Methods::Tversky => norm(tversky),
-            Methods::LCSSeq => norm(lcsseq),
-            Methods::LCSStr => norm(lcsstr),
-            Methods::RatcliffObershelp => norm(ratcliff_obershelp),
-            Methods::Prefix => norm(prefix),
-            Methods::Suffix => norm(suffix),
-            Methods::Length => norm(length),
+            Method::DamerauLevenshtein => norm(damerau_levenshtein),
+            Method::Hamming => norm(hamming),
+            Method::Jaro => norm(jaro),
+            Method::JaroWinkler => norm(jaro_winkler),
+            Method::Levenshtein => norm(levenshtein),
+            Method::Sift4Common => norm(sift4_common),
+            Method::Sift4Simple => norm(sift4_simple),
+            Method::SmithWaterman => norm(smith_waterman),
+            Method::Bag => norm(bag),
+            Method::Cosine => norm(cosine),
+            Method::EntropyNCD => norm(entropy_ncd),
+            Method::Jaccard => norm(jaccard),
+            Method::Overlap => norm(overlap),
+            Method::Roberts => norm(roberts),
+            Method::SorensenDice => norm(sorensen_dice),
+            Method::Tversky => norm(tversky),
+            Method::LCSSeq => norm(lcsseq),
+            Method::LCSStr => norm(lcsstr),
+            Method::RatcliffObershelp => norm(ratcliff_obershelp),
+            Method::Prefix => norm(prefix),
+            Method::Suffix => norm(suffix),
+            Method::Length => norm(length),
         }
 
     }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            Method::DamerauLevenshtein => "DamerauLevenshtein",
+            Method::Hamming => "Hamming",
+            Method::Jaro => "Jaro",
+            Method::JaroWinkler => "JaroWinkler",
+            Method::Levenshtein => "Levenshtein",
+            Method::Sift4Common => "Sift4Common",
+            Method::Sift4Simple => "Sift4Simple",
+            Method::SmithWaterman => "SmithWaterman",
+            Method::Bag => "Bag",
+            Method::Cosine => "Cosine",
+            Method::EntropyNCD => "EntropyNCD",
+            Method::Jaccard => "Jaccard",
+            Method::Overlap => "Overlap",
+            Method::Roberts => "Roberts",
+            Method::SorensenDice => "SorensenDice",
+            Method::Tversky => "Tversky",
+            Method::LCSSeq => "LCSSeq",
+            Method::LCSStr => "LCSStr",
+            Method::RatcliffObershelp => "RatcliffObershelp",
+            Method::Prefix => "Prefix",
+            Method::Suffix => "Suffix",
+            Method::Length => "Length",
+        }
+    }
 } 
 
-impl From<String> for Methods {
+impl From<String> for Method {
     fn from(value: String) -> Self {
         todo!()
     }
 }
 
-impl From<Methods> for String {
-    fn from(value: Methods) -> Self {
+impl From<Method> for String {
+    fn from(value: Method) -> Self {
         todo!()
     }
+}
+
+#[wasm_bindgen]
+pub struct NamedDistance {
+    #[wasm_bindgen(getter_with_clone)]
+    pub name: String,
+    pub distance: f64,
+}
+impl NamedDistance {
+    pub fn new(m: Method, s1: &str, s2: &str) -> Self {
+        Self {
+            name: m.name().into(),
+            distance: m.calculate(s1, s2).as_f64(),
+        }
+    }
+
+    pub fn new_normalized(m: Method, s1: &str, s2: &str) -> Self {
+        Self {
+            name: m.name().into(),
+            distance: m.calculate(s1, s2).normalize(s2.len()),
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn calculate_all(s1: &str, s2: &str) -> Vec<NamedDistance> {
+    Method::all()
+        .into_iter()
+        .map(|x| NamedDistance::new_normalized(x, s1, s2))
+        .collect()
+}
+
+#[wasm_bindgen]
+pub fn calculate_unnormalized(s1: &str, s2: &str) -> Vec<NamedDistance> {
+    Method::unnormalized()
+        .map(|x| NamedDistance::new(x, s1, s2))
+        .collect()
+}
+
+#[wasm_bindgen]
+pub fn calculate_normalized(s1: &str, s2: &str) -> Vec<NamedDistance> {
+    Method::normalized()
+        .map(|x| NamedDistance::new(x, s1, s2))
+        .collect()
 }
