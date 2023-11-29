@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:rust": "wasm-pack build string-compare --target web --dev",
+    "build:rust": "wasm-pack build string-compare --target web",
     "build": "yarn run build:rust && vite build",
     "start": "vite"
   },
