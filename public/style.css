@@ -1,0 +1,52 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+html {
+    height: 100vh;
+}
+
+body {
+    height: 100%;
+    margin: 0em;
+    display: flex;
+    flex-direction: column;
+}
+
+.app {
+    margin: 1em;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+
+    gap: 1em;
+}
+
+.chart-container {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+.chart-parent {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+
+.chart {
+    object-fit: fill;
+}
+
+.spacer {
+    flex: 1;
+}
+
