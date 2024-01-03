@@ -7,27 +7,44 @@ on:
   pull_request:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: '0.110.0'
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Build
-        run: hugo --minify
+        uses: ./
+        id: build
 
-      - name: Deploy
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_artifacts
+          path: dist
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: build
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build_artifacts
+
+      - name: Deploy page
         uses: peaceiris/actions-gh-pages@v3
         # If you're changing the branch from main,
         # also change the `main` in `refs/heads/main`
@@ -35,4 +52,4 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: dist

@@ -1,5 +1,6 @@
 mod chartjs;
 mod methods;
+use methods::Method;
 
 use chartjs::{ChartData, ChartDataset};
 use leptos::*;
@@ -29,6 +30,17 @@ pub fn App() -> impl IntoView {
             </div>
 
             <Charts />
+
+            //<ul>
+            //    { Method::all()
+            //        .map(|x| view! {
+            //            <li>
+            //                <b>{x.name()}</b>
+            //                <i>{x.description()}</i>
+            //            </li>
+            //        }) 
+            //    }
+            //</ul>
         </div>
     }
 }
