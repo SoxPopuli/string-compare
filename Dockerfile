@@ -1,6 +1,5 @@
 FROM alpine:3.18.4 as build
 
-COPY . /src/
 
 RUN apk add nodejs yarn curl g++ make
 
@@ -13,6 +12,7 @@ RUN rustup default nightly
 RUN rustup target add wasm32-unknown-unknown
 RUN cargo install wasm-pack
 
+COPY . /src/
 WORKDIR /src
 
 RUN rm -rf node_modules || true
