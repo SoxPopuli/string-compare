@@ -19,5 +19,4 @@ RUN rm -rf node_modules || true
 RUN yarn install --immutable
 RUN yarn run build
 
-RUN mkdir -p /github/workspace
-RUN cp -rv /src/dist /github/workspace/
+CMD [ "cp", "-rv", "/src/dist", "/github/workspace/" ]
