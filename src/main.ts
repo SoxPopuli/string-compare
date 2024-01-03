@@ -1,4 +1,4 @@
-import init, { mount, calculate_unnormalized, calculate_normalized, NamedDistance } from '../string-compare/pkg/string_compare'
+import init, { mount, calculate_all_normalized, calculate_unnormalized, calculate_normalized, NamedDistance } from '../string-compare/pkg/string_compare'
 //@ts-ignore
 import wasm from '../string-compare/pkg/string_compare_bg.wasm?url'
 
@@ -16,7 +16,7 @@ function display(chart: Chart, s1: string, s2: string) {
         charts.update_chart(chart, normalized_empty, unnormalized_empty)
     } else {
         let unnormalized = calculate_unnormalized(s1, s2)
-        let normalized = calculate_normalized(s1, s2)
+        let normalized = calculate_all_normalized(s1, s2)
         charts.update_chart( chart, normalized, unnormalized )
     }
 }
@@ -33,7 +33,7 @@ init(wasm).then(() => {
         calculate_unnormalized("", "")
         .map(x => { x.distance = 0; return x })
     normalized_empty = 
-        calculate_normalized("", "")
+        calculate_all_normalized("", "")
         .map(x => { x.distance = 0; return x })
     let chart = charts.display_chart( chart_element, normalized_empty, unnormalized_empty )
 

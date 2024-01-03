@@ -252,15 +252,16 @@ impl NamedDistance {
     }
 
     pub fn new_normalized(m: Method, s1: &str, s2: &str) -> Self {
+        let max_len = s1.len().max(s2.len());
         Self {
             name: m.name().into(),
-            distance: m.calculate(s1, s2).normalize(s2.len()),
+            distance: m.calculate(s1, s2).normalize(max_len),
         }
     }
 }
 
 #[wasm_bindgen]
-pub fn calculate_all(s1: &str, s2: &str) -> Vec<NamedDistance> {
+pub fn calculate_all_normalized(s1: &str, s2: &str) -> Vec<NamedDistance> {
     Method::all()
         .into_iter()
         .map(|x| NamedDistance::new_normalized(x, s1, s2))
