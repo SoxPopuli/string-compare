@@ -45,7 +45,7 @@ jobs:
           name: build_artifacts
 
       - name: Deploy page
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
         # If you're changing the branch from main,
         # also change the `main` in `refs/heads/main`
         # below accordingly.
