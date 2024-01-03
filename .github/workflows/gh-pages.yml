@@ -23,7 +23,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build_artifacts
-          path: dist
+          path: ${{ github.workspace }}/*
 
   deploy:
     runs-on: ubuntu-22.04
